@@ -4,6 +4,9 @@
     <string name="main_btn_notification">Notification</string>
     <string name="main_btn_application">Application</string>
 
-    <string name="notification_btn_display_notification">Show notification</string>
+    <string name="notification_btn_display_notification">Show simple notification</string>
+
+    <string name="channel_name">Labo3SYM</string>
+    <string name="channel_description">Labo3SYM</string>
 
 </resources>

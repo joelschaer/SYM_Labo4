@@ -1,11 +1,17 @@
 package ch.heigvd.iict.sym.sym_labo4;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import ch.heigvd.iict.sym.wearcommon.Constants;
@@ -14,6 +20,10 @@ public class NotificationActivity extends AppCompatActivity {
 
     private static final int NOTIFICATION_ID = 1; //code to use for the notification id
 
+    private Button notification_btn_display_notification;
+
+    private final String CHANNEL_ID = "Labo3";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +31,26 @@ public class NotificationActivity extends AppCompatActivity {
 
         if(getIntent() != null)
             onNewIntent(getIntent());
+
+        notification_btn_display_notification  = findViewById(R.id.notification_btn_display_notification);
+        createNotificationChannel();
+        notification_btn_display_notification.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                PendingIntent pendingIntent = createPendingIntent(1,"Hello");
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationActivity.this, CHANNEL_ID)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("My notification")
+                        .setContentText("Much longer text that cannot fit one line...")
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText("Much longer text that cannot fit one line..."))
+                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                builder.setContentIntent(pendingIntent);
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NotificationActivity.this);
+                notificationManager.notify(1, builder.build());
+            }
+        });
+
 
         /* A IMPLEMENTER */
 
@@ -66,6 +96,22 @@ public class NotificationActivity extends AppCompatActivity {
         stackBuilder.addNextIntent(myIntent);
 
         return stackBuilder.getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 }
