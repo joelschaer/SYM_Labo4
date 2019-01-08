@@ -9,6 +9,8 @@ import com.bozapro.circularsliderrange.CircularSliderRange;
 import com.bozapro.circularsliderrange.ThumbEvent;
 import ch.heigvd.iict.sym.sym_labo4.widgets.CircularSliderRangeFixed;
 
+import android.util.Log;
+
 public class MainActivityWear extends WearableActivity implements
         CircularSliderRange.OnSliderRangeMovedListener {
 
@@ -72,6 +74,13 @@ public class MainActivityWear extends WearableActivity implements
     @Override public void onEndSliderEvent(ThumbEvent event) {
         //one of the slider was moved
         //DO SOMETHING
+
+        int r = convertEndAngleToRGBComponent(this.redSlider.getEndAngle());
+        int g = convertEndAngleToRGBComponent(this.greenSlider.getEndAngle());
+        int b = convertEndAngleToRGBComponent(this.blueSlider.getEndAngle()); //use real color...
+
+        mContainerView.setBackgroundColor(Color.argb(255, r,g,b));
+
     }
 
     /**
