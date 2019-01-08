@@ -11,11 +11,21 @@
     tools:context="ch.heigvd.iict.sym.sym_labo4.NotificationActivity">
 
     <Button
-        android:id="@+id/notification_btn_display_notification"
+        android:id="@+id/notification_btn_display_notification_with_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:text="@string/notification_btn_display_notification" />
+
+    <Button
+        android:id="@+id/notification_btn_display_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/notification_btn_display_notification"
+        android:text="@string/notification_btn_display_notification_with_action" />
+
 
 </RelativeLayout>
