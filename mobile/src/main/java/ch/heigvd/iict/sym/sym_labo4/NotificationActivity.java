@@ -21,6 +21,8 @@ public class NotificationActivity extends AppCompatActivity {
     private static final int NOTIFICATION_ID = 1; //code to use for the notification id
 
     private Button notification_btn_display_notification;
+    private Button notification_btn_display_notification_with_action;
+
 
     private final String CHANNEL_ID = "Labo3";
 
@@ -33,16 +35,18 @@ public class NotificationActivity extends AppCompatActivity {
             onNewIntent(getIntent());
 
         notification_btn_display_notification  = findViewById(R.id.notification_btn_display_notification);
+
+        notification_btn_display_notification_with_action = findViewById(R.id.notification_btn_display_notification_with_action);
+
         createNotificationChannel();
+
         notification_btn_display_notification.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 PendingIntent pendingIntent = createPendingIntent(1,"Hello");
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationActivity.this, CHANNEL_ID)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("My notification")
-                        .setContentText("Much longer text that cannot fit one line...")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText("Much longer text that cannot fit one line..."))
+                        .setContentTitle("My simple Notif")
+                        .setContentText("this is a simple notification from my phone")
                         .setContentIntent(pendingIntent)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
                 builder.setContentIntent(pendingIntent);
@@ -51,8 +55,27 @@ public class NotificationActivity extends AppCompatActivity {
             }
         });
 
+        notification_btn_display_notification.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent actionIntent = new Intent(Intent.ACTION_VIEW);
+                PendingIntent actionPendingIntent =
+                        PendingIntent.getActivity(NotificationActivity.this, 0, actionIntent, 0);
+                PendingIntent pendingIntent = createPendingIntent(1,"Hello");
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationActivity.this, CHANNEL_ID)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("My action Notif")
+                        .setContentText("this is a notification with actions")
+                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .addAction(R.drawable.common_google_signin_btn_text_light_focused,
+                                getString(R.string.accept), actionPendingIntent);
+                        builder.setContentIntent(pendingIntent);
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NotificationActivity.this);
+                notificationManager.notify(1, builder.build());
+            }
+        });
 
-        /* A IMPLEMENTER */
+
 
     }
 
