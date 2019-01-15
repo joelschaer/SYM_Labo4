@@ -7,12 +7,23 @@ import android.support.wearable.activity.WearableActivity;
 
 import com.bozapro.circularsliderrange.CircularSliderRange;
 import com.bozapro.circularsliderrange.ThumbEvent;
+import com.google.android.gms.wearable.DataClient;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
 import ch.heigvd.iict.sym.sym_labo4.widgets.CircularSliderRangeFixed;
 
 import android.util.Log;
 
 public class MainActivityWear extends WearableActivity implements
-        CircularSliderRange.OnSliderRangeMovedListener {
+        CircularSliderRange.OnSliderRangeMovedListener,
+        DataClient.OnDataChangedListener {
 
     private static final String TAG = MainActivityWear.class.getSimpleName();
     private static final int ANGLE_OFFSET = 90;
@@ -23,11 +34,19 @@ public class MainActivityWear extends WearableActivity implements
     private CircularSliderRangeFixed greenSlider    = null;
     private CircularSliderRangeFixed blueSlider     = null;
 
+    private DataClient mDataClient;
+    private static final String RED = "RED";
+    private static final String GREEN = "GREEN";
+    private static final String BLUE = "BLUE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_wear);
         setAmbientEnabled();
+        mDataClient = Wearable.getDataClient(this);
+        mDataClient.addListener(this);
+
 
         //link to GUI
         this.mContainerView = findViewById(R.id.container);
@@ -80,7 +99,7 @@ public class MainActivityWear extends WearableActivity implements
         int b = convertEndAngleToRGBComponent(this.blueSlider.getEndAngle()); //use real color...
 
         mContainerView.setBackgroundColor(Color.argb(255, r,g,b));
-
+        updatePhone(r,g,b);
     }
 
     /**
@@ -100,6 +119,30 @@ public class MainActivityWear extends WearableActivity implements
      */
     private double convertRGBValueToEndAngle(int colorComponent) {
         return ((((double)colorComponent)/ 255.0) * 360.0) - ANGLE_OFFSET;
+    }
+
+    private void updatePhone(int red, int green, int blue) {
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/color");
+        putDataMapReq.getDataMap().putInt(RED, red);
+        putDataMapReq.getDataMap().putInt(GREEN, green);
+        putDataMapReq.getDataMap().putInt(BLUE, blue);
+        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+        mDataClient.putDataItem(putDataReq);
+    }
+
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        for (DataEvent event : dataEvents) {
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                // DataItem changed
+                DataItem item = event.getDataItem();
+                if (item.getUri().getPath().compareTo("/color") == 0) {
+                    DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                    mContainerView.setBackgroundColor(Color.argb(255, dataMap.getInt(RED),dataMap.getInt(GREEN),dataMap.getInt(BLUE)));
+                }
+            } else if (event.getType() == DataEvent.TYPE_DELETED) {
+                // DataItem deleted
+            }
+        }
     }
 
 }

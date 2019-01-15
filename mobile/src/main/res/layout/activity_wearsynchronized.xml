@@ -10,6 +10,29 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ch.heigvd.iict.sym.sym_labo4.WearSynchronizedActivity">
 
-    <!-- A IMPLEMENTER -->
+    <SeekBar
+        android:id="@+id/seekBarRed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/RedSeekBarTheme"
+        android:layout_above="@id/seekBarGreen"
 
+        />
+    <SeekBar
+        android:id="@+id/seekBarGreen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/GreenSeekBarTheme"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+
+        />
+
+    <SeekBar
+        android:id="@+id/seekBarBlue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seekBarGreen"
+        android:theme="@style/BlueSeekBarTheme" />
 </RelativeLayout>

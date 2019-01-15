@@ -6,6 +6,17 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
 
+    <style name="RedSeekBarTheme" parent="Widget.AppCompat.SeekBar" >
+        <item name="colorAccent">#E62222</item>
+    </style>
+    <style name="BlueSeekBarTheme" parent="Widget.AppCompat.SeekBar" >
+        <item name="colorAccent">#1F7ACA</item>
+    </style>
+    <style name="GreenSeekBarTheme" parent="Widget.AppCompat.SeekBar" >
+        <item name="colorAccent">#42D61A</item>
+
+    </style>
 </resources>
