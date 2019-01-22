@@ -159,7 +159,7 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
                 mostRecent = dataItem;
                 continue;
             }
-            if (DataMapItem.fromDataItem(dataItem).getDataMap().getLong(TIME) > DataMapItem.fromDataItem(mostRecent).getDataMap().getLong(TIME)) {
+            if (DataMapItem.fromDataItem(dataItem).getDataMap().getLong(TIME) < DataMapItem.fromDataItem(mostRecent).getDataMap().getLong(TIME)) {
                 mostRecent = dataItem;
             }
         }

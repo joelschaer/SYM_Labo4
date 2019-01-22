@@ -22,7 +22,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     private Button notification_btn_display_notification;
     private Button notification_btn_display_notification_with_action;
-
+    private Button notification_btn_display_notification_with_action_wearable_only;
 
     private final String CHANNEL_ID = "Labo3";
 
@@ -38,6 +38,8 @@ public class NotificationActivity extends AppCompatActivity {
 
         notification_btn_display_notification_with_action = findViewById(R.id.notification_btn_display_notification_with_action);
 
+        notification_btn_display_notification_with_action_wearable_only = findViewById(R.id.notification_btn_display_notification_with_action_wearable_only);
+
         createNotificationChannel();
 
         notification_btn_display_notification.setOnClickListener(new View.OnClickListener() {
@@ -48,14 +50,14 @@ public class NotificationActivity extends AppCompatActivity {
                         .setContentTitle("My simple Notif")
                         .setContentText("this is a simple notification from my phone")
                         .setContentIntent(pendingIntent)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                        .setPriority(NotificationCompat.PRIORITY_MAX);
                 builder.setContentIntent(pendingIntent);
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NotificationActivity.this);
                 notificationManager.notify(1, builder.build());
             }
         });
 
-        notification_btn_display_notification.setOnClickListener(new View.OnClickListener() {
+        notification_btn_display_notification_with_action.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent actionIntent = new Intent(Intent.ACTION_VIEW);
                 PendingIntent actionPendingIntent =
@@ -66,7 +68,7 @@ public class NotificationActivity extends AppCompatActivity {
                         .setContentTitle("My action Notif")
                         .setContentText("this is a notification with actions")
                         .setContentIntent(pendingIntent)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
                         .addAction(R.drawable.common_google_signin_btn_text_light_focused,
                                 getString(R.string.accept), actionPendingIntent);
                         builder.setContentIntent(pendingIntent);
@@ -75,11 +77,32 @@ public class NotificationActivity extends AppCompatActivity {
             }
         });
 
+        notification_btn_display_notification_with_action_wearable_only.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent actionIntent = new Intent(Intent.ACTION_VIEW);
+                PendingIntent actionPendingIntent =
+                        PendingIntent.getActivity(NotificationActivity.this, 0, actionIntent, 0);
+
+                NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
+                wearableExtender.addAction( new NotificationCompat.Action.Builder(R.drawable.common_google_signin_btn_text_light_focused, getString(R.string.accept), actionPendingIntent).build());
+
+                PendingIntent pendingIntent = createPendingIntent(1,"Hello");
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationActivity.this, CHANNEL_ID)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("My wearable Notif")
+                        .setContentText("this is a notification with actions for wearable only")
+                        .setContentIntent(pendingIntent)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .extend(wearableExtender);
+
+                builder.setContentIntent(pendingIntent);
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NotificationActivity.this);
+                notificationManager.notify(1, builder.build());
+            }
+        });
 
 
     }
-
-    /* A IMPLEMENTER */
 
     /*
      *  Code fourni pour les PendingIntent

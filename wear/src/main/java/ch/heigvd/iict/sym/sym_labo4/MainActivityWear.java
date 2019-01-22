@@ -110,7 +110,6 @@ public class MainActivityWear extends WearableActivity implements
     @Override public void onStartSliderEvent(ThumbEvent event) { /* NOTHING TO DO */ }
     @Override public void onEndSliderEvent(ThumbEvent event) {
         //one of the slider was moved
-        //DO SOMETHING
 
         int r = convertEndAngleToRGBComponent(this.redSlider.getEndAngle());
         int g = convertEndAngleToRGBComponent(this.greenSlider.getEndAngle());
