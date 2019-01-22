@@ -32,6 +32,7 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
     private static final String RED = "RED";
     private static final String GREEN = "GREEN";
     private static final String BLUE = "BLUE";
+    private static final String TIME = "TIME";
 
     private int red = 0;
     private int green = 0;
@@ -42,8 +43,6 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wearsynchronized);
         mDataClient = Wearable.getDataClient(this);
-        mDataClient.getDataItems().addOnSuccessListener(this);
-        mDataClient.addListener(this);
 
         seekBarRed = findViewById(R.id.seekBarRed);
         seekBarGreen = findViewById(R.id.seekBarGreen);
@@ -113,11 +112,25 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDataClient.getDataItems().addOnSuccessListener(this);
+        mDataClient.addListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDataClient.removeListener(this);
+    }
+
     private void updateWearable() {
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/color");
         putDataMapReq.getDataMap().putInt(RED, red);
         putDataMapReq.getDataMap().putInt(GREEN, green);
         putDataMapReq.getDataMap().putInt(BLUE, blue);
+        putDataMapReq.getDataMap().putLong(TIME, System.currentTimeMillis());
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         mDataClient.putDataItem(putDataReq);
     }
@@ -129,7 +142,7 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
                 DataItem item = event.getDataItem();
                 if (item.getUri().getPath().compareTo("/color") == 0) {
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                    updateColor(dataMap.getInt(RED),dataMap.getInt(GREEN),dataMap.getInt(BLUE));
+                    updateColor(dataMap.getInt(RED), dataMap.getInt(GREEN), dataMap.getInt(BLUE));
                 }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted
@@ -140,6 +153,24 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
     @Override
     public void onSuccess(DataItemBuffer dataItems) {
         // récupérer la dernière entrèe de du device de la montre.
+        DataItem mostRecent = null;
+        for (DataItem dataItem : dataItems) {
+            if (mostRecent == null) {
+                mostRecent = dataItem;
+                continue;
+            }
+            if (DataMapItem.fromDataItem(dataItem).getDataMap().getLong(TIME) > DataMapItem.fromDataItem(mostRecent).getDataMap().getLong(TIME)) {
+                mostRecent = dataItem;
+            }
+        }
+        if (mostRecent != null) {
+            // DataItem changed
+            DataItem item = mostRecent;
+            if (item.getUri().getPath().compareTo("/color") == 0) {
+                DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                updateColor(dataMap.getInt(RED), dataMap.getInt(GREEN), dataMap.getInt(BLUE));
+            }
+        }
     }
 
     /*
@@ -148,6 +179,7 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
 
     /**
      * Method used to update the background color of the activity
+     *
      * @param r The red composant (0...255)
      * @param g The green composant (0...255)
      * @param b The blue composant (0...255)
@@ -157,7 +189,7 @@ public class WearSynchronizedActivity extends AppCompatActivity implements
         seekBarGreen.setProgress(g);
         seekBarBlue.setProgress(b);
         View rootView = findViewById(android.R.id.content);
-        rootView.setBackgroundColor(Color.argb(255, r,g,b));
+        rootView.setBackgroundColor(Color.argb(255, r, g, b));
     }
 
 }

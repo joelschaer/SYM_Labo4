@@ -7,10 +7,12 @@ import android.support.wearable.activity.WearableActivity;
 
 import com.bozapro.circularsliderrange.CircularSliderRange;
 import com.bozapro.circularsliderrange.ThumbEvent;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.wearable.DataClient;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -20,10 +22,12 @@ import com.google.android.gms.wearable.Wearable;
 import ch.heigvd.iict.sym.sym_labo4.widgets.CircularSliderRangeFixed;
 
 import android.util.Log;
+import android.view.View;
 
 public class MainActivityWear extends WearableActivity implements
         CircularSliderRange.OnSliderRangeMovedListener,
-        DataClient.OnDataChangedListener {
+        DataClient.OnDataChangedListener,
+        OnSuccessListener<DataItemBuffer> {
 
     private static final String TAG = MainActivityWear.class.getSimpleName();
     private static final int ANGLE_OFFSET = 90;
@@ -38,6 +42,7 @@ public class MainActivityWear extends WearableActivity implements
     private static final String RED = "RED";
     private static final String GREEN = "GREEN";
     private static final String BLUE = "BLUE";
+    private static final String TIME = "TIME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +83,19 @@ public class MainActivityWear extends WearableActivity implements
         updateBackgroundColor();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDataClient.getDataItems().addOnSuccessListener(this);
+        mDataClient.addListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDataClient.removeListener(this);
+    }
+
     private void updateBackgroundColor() {
         if (isAmbient()) {
             mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
@@ -98,8 +116,29 @@ public class MainActivityWear extends WearableActivity implements
         int g = convertEndAngleToRGBComponent(this.greenSlider.getEndAngle());
         int b = convertEndAngleToRGBComponent(this.blueSlider.getEndAngle()); //use real color...
 
-        mContainerView.setBackgroundColor(Color.argb(255, r,g,b));
-        updatePhone(r,g,b);
+        updateColor(r,g,b);
+    }
+
+    public void onSuccess(DataItemBuffer dataItems) {
+        // récupérer la dernière entrèe de du device de la montre.
+        DataItem mostRecent = null;
+        for (DataItem dataItem : dataItems) {
+            if (mostRecent == null) {
+                mostRecent = dataItem;
+                continue;
+            }
+            if (DataMapItem.fromDataItem(dataItem).getDataMap().getLong(TIME) > DataMapItem.fromDataItem(mostRecent).getDataMap().getLong(TIME)) {
+                mostRecent = dataItem;
+            }
+        }
+        if (mostRecent != null) {
+            // DataItem changed
+            DataItem item = mostRecent;
+            if (item.getUri().getPath().compareTo("/color") == 0) {
+                DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                updateColor(dataMap.getInt(RED), dataMap.getInt(GREEN), dataMap.getInt(BLUE));
+            }
+        }
     }
 
     /**
@@ -137,12 +176,21 @@ public class MainActivityWear extends WearableActivity implements
                 DataItem item = event.getDataItem();
                 if (item.getUri().getPath().compareTo("/color") == 0) {
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                    mContainerView.setBackgroundColor(Color.argb(255, dataMap.getInt(RED),dataMap.getInt(GREEN),dataMap.getInt(BLUE)));
+                    updateColor(dataMap.getInt(RED),dataMap.getInt(GREEN),dataMap.getInt(BLUE));
                 }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted
             }
         }
+    }
+
+    private void updateColor(int r, int g, int b) {
+
+        redSlider.setEndAngle(convertRGBValueToEndAngle(r));
+        greenSlider.setEndAngle(convertRGBValueToEndAngle(g));
+        blueSlider.setEndAngle(convertRGBValueToEndAngle(b));
+        mContainerView.setBackgroundColor(Color.argb(255, r,g,b));
+        updatePhone(r,g,b);
     }
 
 }
