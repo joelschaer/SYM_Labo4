@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SYM-Labo4</string>
+    <string name="app_name">ChrisWatchBeckham</string>
 
     <string name="accept">accept !</string>
 
@@ -11,7 +11,7 @@
     <string name="notification_btn_display_notification_with_action_wearable_only">Show notification with action button wearable only</string>
 
 
-    <string name="channel_name">Labo3SYM</string>
-    <string name="channel_description">Labo3SYM</string>
+    <string name="channel_name">Labo4SYM</string>
+    <string name="channel_description">Labo4SYM</string>
 
 </resources>
